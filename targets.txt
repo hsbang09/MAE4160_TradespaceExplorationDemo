@@ -1,0 +1,16 @@
+Satellite/Sat1/Sensor/Antenna1/
+Satellite/Sat2/Sensor/Antenna1/
+Satellite/Sat3/Sensor/Antenna1/
+Satellite/Sat4/Sensor/Antenna1/
+Satellite/Sat5/Sensor/Antenna1/
+Satellite/Sat6/Sensor/Antenna1/
+Satellite/Sat7/Sensor/Antenna1/
+Satellite/Sat8/Sensor/Antenna1/
+Satellite/Sat9/Sensor/Antenna1/
+Satellite/Sat10/Sensor/Antenna1/
+Satellite/Sat11/Sensor/Antenna1/
+Satellite/Sat12/Sensor/Antenna1/
+Satellite/Sat13/Sensor/Antenna1/
+Satellite/Sat14/Sensor/Antenna1/
+Satellite/Sat15/Sensor/Antenna1/
+Satellite/Sat16/Sensor/Antenna1/

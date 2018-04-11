@@ -1,0 +1,22 @@
+function sat_out = sat_comm_MassPower(sat_in)
+
+% sat_adcs_MassPower
+%   sat = sat_comm_MassPower(sat);
+Antenna_Mass        = 1;
+Antenna_Power       = 1;
+
+Transponder_Mass     = 1.0;
+P = sat_in.DLTXPower;
+eff = 0.45 - 0.015*(P-5);
+Transponder_Power    = P*(1+1/eff);
+
+Others_mass = 1; %Diplexer, wires, etc.
+Others_power = 1; 
+
+% assign model outputs
+sat_out                 = sat_in;
+sat_out.TTCMass        = sat_in.TTCRedundancy*(Antenna_Mass+Transponder_Mass)+Others_mass;
+sat_out.TTCPower       = sat_in.TTCRedundancy*(Antenna_Power+Transponder_Power)+Others_power;
+
+
+return;

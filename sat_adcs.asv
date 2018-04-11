@@ -1,0 +1,17 @@
+function sat_out = sat_adcs(sat_in)
+
+% sat_adcs
+%   sat = sat_adcs(sat);
+%
+%   Function to model the CRISIS-sat Attitude Determination and Control System.
+
+global sat
+% unpackage sat struct
+% call internal functions
+sat1 = sat_in;
+sat2 = sat_adcs_disturbances (sat1);
+%[sat3] = sat_adcs_actuators (sat2);
+%[sat_out] = sat_adcs_sensors (sat_in);
+
+% assign model outputs
+return;

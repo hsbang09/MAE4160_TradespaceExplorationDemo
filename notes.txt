@@ -1,0 +1,31 @@
+COMM
+- Redo the comm function to accept any subset of parameters as inputs
+- Comm mass and power
+- Plot Psat as a function of the number of images per day
+
+GROUND STATIONS
+3 OPTIONS
+1) 1 FIX GS. CHOOSE LOCATION AS TO MAXIMIZE TOTAL COMM TIME
+2) N FIX GS. PLOT NGS AS A FUNCTION OF NUMBER OF IMAGES PER DAY (TOTAL COMM TIME) AND RESPONSE TIME
+3) 1 MOBILE GS. RESPONSE TIME = 0. PLOT D_GS AS A NUMBER OF THE IMAGES PER DAY OR RESPONSE TIME. 
+
+
+TO DO LIST
+
+- Recover Response Time from each satellite to GS1 or GS2. For this:
+	OK - stkSetCoverageAsset(conid, antenna_path, fac_sensor_path(m));
+	OK - call = ['Cov ' antenna_path ' FOMDefine Definition ResponseTime Compute Average'];
+	- call = ['Cov ' path_sat ' Access Compute Export "FOM Value" "C:\Users\Dani\Documents\PhD\coursework\16.851 Satellite engineering\project\models\matlab\results.csv"'];
+	- read CSV file
+	- compute mean response time for each satellite
+
+- Uncomment the end of sat_system
+- Uncomment the end of sat_stk
+FILES TO UPLOAD
+
+- sat_initialize.m
+- sat_stk.m
+- sat_comm.m
+- AssignTargetToSensor.m
+
+

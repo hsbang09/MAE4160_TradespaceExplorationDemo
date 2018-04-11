@@ -1,0 +1,8 @@
+function AssignTargetToSensor(conid, sensor_path, target_path)
+
+call = ['Point ' sensor_path ' Targeted Add ' target_path];
+stkExec(conid,call);
+
+call = ['Point ' fac_sensor_path ' Targeted Tracking '];
+stkExec(conid,call);
+return

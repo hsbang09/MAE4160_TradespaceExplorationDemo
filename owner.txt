@@ -1,0 +1,14 @@
+----------------------
+Currently checked out:
+----------------------
+None
+
+
+----
+Log:
+----
+13 Oct 08  23:34  Dani  Updated the presentation slides ADCS, comm, and single axis trades.
+13 Oct 08  23:34  Dani  Updated sat_initialize.m, sat_comm.m and N2diagram.xlsx with info from sat_comm.m
+13 Oct 08  12:20  Matt  Uploaded sat_compare.m, sat_system.m, and sat_plot.m
+13 Oct 08  10:40  Matt  Updated sat_initialize.m (added .DataSize, removed .Nbits fields from optical outputs)
+13 Oct 08  09:00  Matt  Modified sat_orbits.m so that the entire struct is passed through the function

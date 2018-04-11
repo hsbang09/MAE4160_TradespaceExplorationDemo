@@ -1,0 +1,22 @@
+function sat_out = PowerBudget(sat_in)
+% Inputs
+P_ADCS = sat_in.PowerADCS;
+P_comm = sat_in.PowerComm;
+P_optics = sat_in.PowerOptics;
+P_power = sat_in.PowerPower;
+P_thermal = sat_in.PowerThermal;
+P_prop = sat_in.PowerProp;
+
+% Calculations
+P = P_ADCS + P_comm + P_optics + P_power + P_thermal + P_prop;
+
+% Plot
+
+power_budget = [P_ADCS P_comm P_optics P_power P_thermal P_prop];
+pie3(power_budget,{'ADCS','Comm','Optics','Power','Thermal','Propulsion'});
+title('Spacecraft Power budget');
+
+%Outputs
+sat_out = sat_in;
+sat_out.Power = P;
+return

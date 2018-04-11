@@ -1,0 +1,17 @@
+% Plots the dependence of the MF disturbance torque with the orbit altitude
+initConstants;
+
+%Input parameters
+D = 1;
+
+
+%X Variable: altitude
+h = 1000*[100:10:1000];
+R = RE+h;
+
+Tm = MFDisturbanceTorque (D,R);
+
+plot(h./1000,Tm);
+title(['Magnetic Field DT vs orbit altitude for D= ',num2str(D)]);
+xlabel(' Orbit altitude (km)');
+ylabel(' MF Disturbance Torque (N*m)');

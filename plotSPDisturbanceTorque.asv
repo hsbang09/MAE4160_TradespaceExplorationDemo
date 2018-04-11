@@ -1,0 +1,22 @@
+% Plots the dependence of the GG disturbance torque with the orbit altitude
+initConstants;
+
+%Input parameters
+%As=3;
+q = 0.6;
+i = [0:1:360]; % minimum angle, max perturbation
+cps_cg = 0.3;
+
+%X Variable:
+a = [0.5:0.1:2.0];
+b = [0.5:0.1:2.0];
+%As = a.*b;
+As = 2.0;
+Tsp = SPDisturbanceTorque (As, q, i, cps_cg)
+
+plot(i,Tsp);
+title(['Solar Pressure DT vs Sun Incidence Angle, q = ', num2str(q), ', As = ',num2str(As),', cps-cg = ',num2str(cps_cg)]);
+%xlabel(' Surface area (m^2)');
+xlabel(' sun Incidence angle (deg)');
+ylabel(' SP Disturbance Torque (N*m)');
+

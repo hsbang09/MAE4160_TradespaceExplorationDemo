@@ -1,0 +1,7 @@
+function [D,theta] = Gain2Diameter(G_dB,f_GHz)
+% Gain2Diameter.m
+% Calculates antenna diameter from the gain given a frequency
+G_lin = lin2dB(G_dB);
+lambda = c/(f_GHz*1e9);
+D = sqrt((G_lin*lambda_UL^2)/(pi^2*effR_sat));
+theta = 21/(f_GHz*D);
