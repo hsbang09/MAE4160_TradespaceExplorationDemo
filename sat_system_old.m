@@ -22,8 +22,9 @@ function sat_out = sat_system(sat_in)
 %   13 Oct 2008
 
 % Initialize the STK/MATLAB interface
-% agiInit;
-% stkInit;
+
+app = stkConnectToMatlab()
+
 remMachine = stkDefaultHost;
 
 % open a socket to STK
@@ -31,6 +32,12 @@ conid = stkOpen(remMachine);
 
 % Create a Scenario
 stkNewObj('/','Scenario', 'CRISIS');
+scenario_path = '/Scenario/CRISIS/';
+stkSetAnimationTimeStep(conid,scenario_path,3);
+
+% for keeping track of the run
+total = numel(sat_in);
+counter = 1;
 
 for i = 1:size(sat_in,1)
     for j = 1:size(sat_in,2)
@@ -45,23 +52,45 @@ for i = 1:size(sat_in,1)
                     
                     % optical payload model
                     temp = sat_optics(temp);
+
+                    % First STK module
+                    temp = sat_mini_stk(temp,conid);
                     
                     % ADCS model
                     temp = sat_adcs(temp);
+   
+                    % OBDH model
+                    temp = sat_obdh(temp);
                     
                     % communications subsystem model
-                    temp = sat_comm(temp);
+                    temp = sat_comm(temp,conid);
                     
                     % STK simulation
                     temp = sat_stk(temp,conid);
+
+                    % thermal model
+                    temp = sat_thermal(temp);
+                    
+                    % propulsion model
+                    temp = sat_prop(temp);
                     
                     % power model
                     temp = sat_power(temp);
+                    
+                    % mass budget
+                    temp = sat_mass(temp);
                     
                     % cost model
                     temp = sat_cost(temp);
                     
                     sat_out(i,j,k,l,m) = temp;
+                    
+                    % display message
+                    fprintf('%3.0f of %3.0f\n', counter, total);
+                    counter = counter + 1;
+                    
+                    % keep a record
+                    save sat_log sat_out;
                     
                 end
             end
@@ -72,7 +101,7 @@ end
 % Close out the stk connection
 stkClose(conid);
 
-% Close any default connection
-stkClose;
+% Close any connection
+stkClose('all');
 
 return;

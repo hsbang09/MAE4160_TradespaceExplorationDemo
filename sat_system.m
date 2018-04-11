@@ -22,8 +22,13 @@ function sat_out = sat_system(sat_in)
 %   13 Oct 2008
 
 % Initialize the STK/MATLAB interface
-agiInit;
-remMachine = stkDefaultHost;
+
+app = stkConnectToMatlab()
+
+
+
+
+
 
 % open a socket to STK
 conid = stkOpen(remMachine);
