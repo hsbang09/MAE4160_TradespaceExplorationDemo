@@ -1,4 +1,4 @@
-function [sat_out] = sat_comm(sat_in,conid)
+function [sat_out] = sat_comm(sat_in)
 
 % sat_comm
 %   sat = sat_comm(sat);

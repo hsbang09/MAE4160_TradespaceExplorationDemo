@@ -20,118 +20,104 @@ function sat_out = sat_system(sat_in)
 %   Matthew Smith <m_smith@mit.edu>
 %
 %   13 Oct 2008
+% 
+% 
+%   Modified by Harris Bang <hb398@cornell.edu>
+%
+%   12 Apr 2018
+%
 
+try
+    
 % Initialize the STK/MATLAB interface
 % Connect to STK
-disp( 'Connecting Matlab to STK...' );
-[app, root] = stkConnectToMatlab();
+% disp( 'Connecting Matlab to STK...' );
+% [app, root] = stkConnectToMatlab();
 
 % Create and configure the STK scenario
-scenario = stkCreateAndConfigureScenario(root);
-
-% open a socket to STK
-conid = stkOpen(remMachine);
-
-% Create a Scenario
-stkNewObj('/','Scenario', 'CRISIS');
-scenario_path = '/Scenario/CRISIS/';
-stkSetAnimationTimeStep(conid,scenario_path,3);
+% scenario = stkCreateAndConfigureScenario(root);
 
 % for keeping track of the run
-numOptions = size(sat_in);
-numVars = length(numOptions);
-
-total = 1;
-for i = 1:numVars
-    total = total * numOptions(i);
-end
-
-selectedOptions = ones(1,numVars);
-for i = 1:total
     
-    % Iterate over each variable
-    for j = 1:numVars
-        if i == 1
-            continue;
-    
-        elseif selectedOptions(j) == numOptions(j)
-            % Exceeds the number of options available: move on to the next
-            % variable
-            continue;
-           
-        else
-            % Modify the current variable
-            selectedOptions(j) = selectedOptions(j) + 1;
-            break;
+    total = numel(sat_in);
+    counter = 1;
+
+    for i = 1:size(sat_in,1)
+        for j = 1:size(sat_in,2)
+            for k = 1:size(sat_in,3)
+                for l = 1:size(sat_in,4)
+                    for m = 1:size(sat_in,5)
+
+                        temp = sat_in(i,j,k,l,m);
+
+                        % orbit dynamics model
+                        temp = sat_orbit(temp);
+
+                        % optical payload model
+                        temp = sat_optics(temp);
+
+                        % First STK module
+                        temp = sat_mini_stk(temp,scenario);
+
+                        % ADCS model
+                        temp = sat_adcs(temp);
+
+                        % OBDH model
+                        temp = sat_obdh(temp);
+
+                        % communications subsystem model
+                        temp = sat_comm(temp);
+
+                        % STK simulation
+    %                     temp = sat_stk(temp,scenario);
+
+                        % thermal model
+                        temp = sat_thermal(temp);
+
+                        % propulsion model
+                        temp = sat_prop(temp);
+
+                        % power model
+                        temp = sat_power(temp);
+
+                        % mass budget
+                        temp = sat_mass(temp);
+
+                        % cost model
+                        temp = sat_cost(temp);
+
+                        sat_out(i,j,k,l,m) = temp;
+
+                        % display message
+                        fprintf('%3.0f of %3.0f\n', counter, total);
+                        counter = counter + 1;
+
+                        % keep a record
+                        save sat_log sat_out;
+
+                    end
+                end
+            end
         end
     end
-    
-    % If a variable option is set as 0, increase the value
-    selectedOptions_temp = selectedOptions;
-    for j = 1:numVars
-        if selectedOptions_temp(j) == 0
-            selectedOptions_temp(j) = 1;
-        end
-    end
-    
-    selectedOptions_temp
 
-    args = mat2cell(selectedOptions_temp,1,ones(1,numel(selectedOptions_temp)));
-    
-%     this_sat = sat_in(args{:})
+    disp( 'Closing the STK scenario...' );
+    root.CloseScenario;
+
+catch exception
+        
+%     clear params;
+%     clear r;
 % 
-%     % orbit dynamics model
-%     this_sat = sat_orbit(this_sat);
+%     disp( 'Clearing STK data...' );
+%     % rmdir( folder_name, 's' );
 % 
-%     % optical payload model
-%     this_sat = sat_optics(this_sat);
+%     disp( 'Closing the STK scenario' );
+%     root.CloseScenario;
 % 
-%     % First STK module
-%     this_sat = sat_mini_stk(this_sat,conid);
-% 
-%     % ADCS model
-%     this_sat = sat_adcs(this_sat);
-% 
-%     % OBDH model
-%     this_sat = sat_obdh(this_sat);
-% 
-%     % communications subsystem model
-%     this_sat = sat_comm(this_sat,conid);
-% 
-%     % STK simulation
-%     this_sat = sat_stk(this_sat,conid);
-% 
-%     % thermal model
-%     this_sat = sat_thermal(this_sat);
-% 
-%     % propulsion model
-%     this_sat = sat_prop(this_sat);
-% 
-%     % power model
-%     this_sat = sat_power(this_sat);
-% 
-%     % mass budget
-%     this_sat = sat_mass(this_sat);
-% 
-%     % cost model
-%     this_sat = sat_cost(this_sat);
-% 
-%     sat_out(i,j,k,l,m) = this_sat;
-% 
-%     % display message
-%     fprintf('%3.0f of %3.0f\n', counter, total);
-%     counter = counter + 1;
-% 
-%     % keep a record
-%     save sat_log sat_out;
-    
+%     disp( 'Disconnecting Matlab from STK' );
+%     %stkDisconnectFromMatlab;
+    rethrow( exception );
+        
 end
-
-
-% Close out the stk connection
-stkClose(conid);
-
-% Close any connection
-stkClose('all');
-
 return;

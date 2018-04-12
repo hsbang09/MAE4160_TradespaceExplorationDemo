@@ -5,8 +5,8 @@ function scenario = stkCreateAndConfigureScenario(root)
     fprintf('DONE\n');
     
     fprintf('Configuring scenario...');
-    scenario.SetTimePeriod('27 Jul 2015 16:00:00.000','27 Aug 2015 16:00:00.000');
-    scenario.Animation.AnimStepValue = 60;
+    scenario.SetTimePeriod('27 Jul 2020 16:00:00.000','27 Aug 2020 16:00:00.000');
+    scenario.Animation.AnimStepValue = 3.0;
     root.ExecuteCommand('Animate * Reset');
     fprintf('DONE\n');
 

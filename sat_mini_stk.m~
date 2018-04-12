@@ -59,10 +59,35 @@ sensor_params = [eta, 90];
 sensor = stkAddSensor( satellite, sensor_name, 'Recetangular', sensor_params);
 
 % Assign ground stations as asset for  satellite's antenna
-coverage = stkSetCoverageAsset(conid, sensor_path, fac_sensor_path);
-results = coverage.Compute;
+stkSetCoverageAsset(conid, sensor_path, fac_sensor_path);
 
 
+
+% IAgAircraft aircraft: Aircraft object 
+objCoverage = aircraft.ObjectCoverage; 
+objCoverage.Assets.RemoveAll; 
+objCoverage.Assets.Add('Satellite/MySatellite'); 
+objCoverage.UseObjectTimes = true; 
+objCoverage.Compute; 
+ 
+objCoverageFOM = objCoverage.FOM; 
+if objCoverageFOM.IsDefinitionTypeSupported('eFmAccessDuration') 
+    objCoverageFOM.SetDefinitionType('eFmAccessDuration'); 
+    objCoverageFOM.Definition.SetComputeType('eMaximum'); 
+end 
+ 
+ 
+
+
+
+
+call = ['Cov_RM ' sensor_path ' Access Compute "Coverage"'];
+
+
+
+
+
+results = stkExec(conid,call);
 Naccesses = size(results,1)-2;
 dur_access = zeros(Naccesses,1);
 for k = 1:Naccesses
@@ -82,10 +107,10 @@ access_duration = max_comm_time;
 % -------------------------------------------------------------------------
 % Close all objects except the scenario
 % -------------------------------------------------------------------------
-% objects = stkObjNames;
-% for i = length(objects):-1:2
-%     stkUnload(objects{i});
-% end
+objects = stkObjNames;
+for i = length(objects):-1:2
+    stkUnload(objects{i});
+end
 
 sat_out = sat_in;
 sat_out.InTheaterAccessDuration = access_duration;
