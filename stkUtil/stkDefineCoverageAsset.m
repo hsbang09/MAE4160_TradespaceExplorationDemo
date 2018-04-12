@@ -1,11 +1,11 @@
 
-function objCoverage = stkSetCoverageAsset( parentObj, sensorID)
+function objCoverage = stkDefineCoverageAsset( scenario, asset_id )
 
     fprintf(['Setting the coverage asset ...']);
     
-    objCoverage = parentObj.ObjectCoverage; 
+    objCoverage = scenario.ObjectCoverage; 
     objCoverage.Assets.RemoveAll; 
-    objCoverage.Assets.Add('Satellite/MySatellite'); 
+    objCoverage.Assets.Add(strcat('Satellite/', asset_id)); 
     objCoverage.UseObjectTimes = true; 
 %     objCoverage.Compute; 
      

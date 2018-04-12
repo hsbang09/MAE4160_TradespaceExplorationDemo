@@ -29,16 +29,15 @@ function sat_out = sat_system(sat_in)
 
 try
     
-% Initialize the STK/MATLAB interface
-% Connect to STK
-% disp( 'Connecting Matlab to STK...' );
-% [app, root] = stkConnectToMatlab();
+    % Initialize the STK/MATLAB interface
+    % Connect to STK
+    disp( 'Connecting Matlab to STK...' );
+    [app, root] = stkConnectToMatlab();
 
-% Create and configure the STK scenario
-% scenario = stkCreateAndConfigureScenario(root);
+    % Create and configure the STK scenario
+    scenario = stkCreateAndConfigureScenario(root);
 
-% for keeping track of the run
-    
+    % for keeping track of the run
     total = numel(sat_in);
     counter = 1;
 

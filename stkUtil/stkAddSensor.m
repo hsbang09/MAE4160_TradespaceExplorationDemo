@@ -7,11 +7,11 @@ function sensor = stkAddSensor( parentObj, sensorID, patternType, args)
 
     % IAgSensor sensor: Sensor object
 	% Change pattern and set
-    if strcmp(mode,'SimpleConic')
+    if strcmp(patternType, 'SimpleConic')
         % sensor.SetPatternType('eSnSimpleConic');
         sensor.CommonTasks.SetPatternSimpleConic(40.0, 0.1); 
         
-    elseif strcmp(mode,'Rectangular')
+    elseif strcmp(patternType, 'Rectangular')
         sensor.CommonTasks.SetPatternRectangular(20, 25) 
         
     else

@@ -18,7 +18,7 @@ LLApos = [dtr*lat_gs; dtr*lon_gs];
 gs_info = {};
 gs_info.id = 'Louisiana';
 gs_info.lat = lat_gs;
-gs_info.lon = lon_gs;
+gs_info.long = lon_gs;
 
 % Internal calculations
 
@@ -26,7 +26,7 @@ gs_info.lon = lon_gs;
 facility = stkAddFacility(scenario, gs_info);
 
 % add a sensor to the ground station
-sensor = stkAddSensor(facility, 'Antenna');
+ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', []);
 
 % -------------------------------------------------------------------------
 % Create constellation with nplanes separated Delta_RAAN = 180/nplanes deg  
@@ -43,25 +43,35 @@ sat_info = {};
 sat_info.id = sat_name;
 sat_info.orbit = {};
 sat_info.orbit.ecc = 0;
-sat_info.orbit.sa = semimajorAxis;
-sat_info.orbit.inc = inc;
+sat_info.orbit.sa = semimajorAxis/1000; % [km]
+sat_info.orbit.inc = inc/pi*180; %[deg]
 sat_info.orbit.ap = 0;
 sat_info.orbit.raan = 0;
 sat_info.orbit.ma = 0;
 
-satellite = stkAddSatellite( scenario, sat_name );
+satellite = stkAddSatellite( scenario, sat_info );
 
 % Add a sensor (payload) to the satellite
 s = 1;
 sensor_name = ['Sensor' num2str(s)];
 sensor_params = [eta, 90];
+sat_sensor = stkAddSensor( satellite, sensor_name, 'Rectangular', sensor_params);
 
-sensor = stkAddSensor( satellite, sensor_name, 'Recetangular', sensor_params);
+
+% IAgSatellite satellite: Satellite object
+% IAgFacility facility: Facility object
+
+% Get access by STK Object
+access = satellite.GetAccessToObject(facility);
+% Compute access
+result = access.ComputeAccess()
+
+
 
 % Assign ground stations as asset for  satellite's antenna
-coverage = stkSetCoverageAsset(conid, sensor_path, fac_sensor_path);
+asset_id = sat_name;
+coverage = stkDefineCoverageAsset( scenario, asset_id );
 results = coverage.Compute;
-
 
 Naccesses = size(results,1)-2;
 dur_access = zeros(Naccesses,1);
