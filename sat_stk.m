@@ -1,4 +1,4 @@
-function [sat_out] = sat_stk(sat_in, conid)
+function [sat_out] = sat_stk(sat_in, scenario)
 % SAT_STK 
 %   sat = sat_stk(sat)
 % 
@@ -20,8 +20,6 @@ function [sat_out] = sat_stk(sat_in, conid)
 % Constants
 dtr     = pi/180;
 Re      = 6378;                         % Radius of the Earth in km
-scenario_path = '/Scenario/CRISIS/';
-scenario_name = 'CRISIS';
 
 % Inputs
 
@@ -42,28 +40,32 @@ D_GS    = sat_in.ULTXAntennaDiameter; % Diameter of the ground station antenna
 % Internal calculations
 
 
-
 % -------------------------------------------------------------------------
 % Create a ground station, set locations, add a sensor to each
 % -------------------------------------------------------------------------
 for i = 1:n_gs
     facility_name = ['GS' num2str(i)];
-    facility_path = ['/Scenario/' scenario_name '/Facility/' facility_name '/'];
-    
-    % create a ground station
-    stkNewObj(scenario_path, 'Facility', facility_name);
     
     % set location
-    LLApos = [dtr*lat_gs(i); dtr*lon_gs(i)];
-    stkSetFacPosLLA(facility_path, LLApos);
+    lat_gs = lat_gs(i);
+    lon_gs = lon_gs(i);
+    LLApos = [dtr*lat_gs; dtr*lon_gs];
+
+    gs_info = {};
+    gs_info.id = facility_name;
+    gs_info.lat = lat_gs;
+    gs_info.long = lon_gs;
+
+    % Internal calculations
+
+    % create a ground station
+    facility = stkAddFacility(scenario, gs_info);
 
     % add a sensor to the ground station
-    stkNewObj(facility_path, 'Sensor', 'Antenna');
+    ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', []);
     
     % set sensor properties
-    fac_sensor_path = ['/Scenario/' scenario_name '/Facility/' facility_name '/Sensor/Antenna'];
-    stkSetSensor(conid, fac_sensor_path, 'HalfPower', f_GHz, D_GS);
-    
+    ground_sensor.CommonTasks.SetPatternHalfPower( f_GHz, D_GS  );
 end
 
 
@@ -71,12 +73,25 @@ end
 % Create a Coverage Grid
 % -------------------------------------------------------------------------
 coverage_name = 'Coverage1';
+
+
+
 stkNewObj(scenario_path, 'CoverageDefinition', coverage_name);
 coverage_path = ['/Scenario/' scenario_name '/' 'CoverageDefinition' '/' coverage_name '/'];
 %Set coverage properties (latitude bounds) using stkSetCoverageBounds
 lat_min = -70;
 lat_max = +70;
 stkSetCoverageBounds(conid,coverage_path, lat_min, lat_max);
+
+
+
+
+coverage = stkSetCoverage(scenario, coverage_name);
+
+
+
+
+
 
 
 % -------------------------------------------------------------------------
