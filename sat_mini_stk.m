@@ -86,16 +86,16 @@ for k = 1:Naccesses
     startYear = str2double(startDateAndTime{3});
     startMonth = convertMonthString2Number(startDateAndTime{2});
     startDate = str2double(startDateAndTime{1});
-    startTimeHour = str2double(startDateAndTime{1});
-    startTimeMinute = str2double(startDateAndTime{2});
-    startTimeSecond = str2double(startDateAndTime{3});
+    startTimeHour = str2double(startTime{1});
+    startTimeMinute = str2double(startTime{2});
+    startTimeSecond = str2double(startTime{3});
     
     endYear = str2double(endDateAndTime{3});
     endMonth = convertMonthString2Number(endDateAndTime{2});
     endDate = str2double(endDateAndTime{1});
-    endTimeHour = str2double(endDateAndTime{1});
-    endTimeMinute = str2double(endDateAndTime{2});
-    endTimeSecond = str2double(endDateAndTime{3});
+    endTimeHour = str2double(endTime{1});
+    endTimeMinute = str2double(endTime{2});
+    endTimeSecond = str2double(endTime{3});
     
     startDateNumber = datenum(startYear, startMonth, startDate, startTimeHour, startTimeMinute, startTimeSecond);
     endDateNumber = datenum(endYear, endMonth, endDate, endTimeHour, endTimeMinute, endTimeSecond);
