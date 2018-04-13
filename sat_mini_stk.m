@@ -62,23 +62,47 @@ sat_sensor = stkAddSensor( satellite, sensor_name, 'Rectangular', sensor_params)
 % IAgFacility facility: Facility object
 
 % Get access by STK Object
-access = satellite.GetAccessToObject(facility);
+access = sat_sensor.GetAccessToObject(ground_sensor);
 % Compute access
-result = access.ComputeAccess()
+access.ComputeAccess();
 
 
+intervalCollection = access.ComputedAccessIntervalTimes;
+Naccesses = intervalCollection.Count();
+intervalArrays = intervalCollection.ToArray(0,Naccesses);
 
-% Assign ground stations as asset for  satellite's antenna
-asset_id = sat_name;
-coverage = stkDefineCoverageAsset( scenario, asset_id );
-results = coverage.Compute;
-
-Naccesses = size(results,1)-2;
 dur_access = zeros(Naccesses,1);
 for k = 1:Naccesses
-    dur_access(k) = sscanf(results(k+1,:),'%*d,%*[^,],%*[^,],%f');
+    
+    startDateAndTime = intervalArrays(k, 1);
+    endDateAndTime = intervalArrays(k, 2);
+    
+    startDateAndTime = strsplit(startDateAndTime{1});
+    endDateAndTime = strsplit(endDateAndTime{1});
+    
+    startTime = strsplit(startDateAndTime{4}, ':');
+    endTime = strsplit(endDateAndTime{4}, ':');
+    
+    startYear = str2double(startDateAndTime{3});
+    startMonth = convertMonthString2Number(startDateAndTime{2});
+    startDate = str2double(startDateAndTime{1});
+    startTimeHour = str2double(startDateAndTime{1});
+    startTimeMinute = str2double(startDateAndTime{2});
+    startTimeSecond = str2double(startDateAndTime{3});
+    
+    endYear = str2double(endDateAndTime{3});
+    endMonth = convertMonthString2Number(endDateAndTime{2});
+    endDate = str2double(endDateAndTime{1});
+    endTimeHour = str2double(endDateAndTime{1});
+    endTimeMinute = str2double(endDateAndTime{2});
+    endTimeSecond = str2double(endDateAndTime{3});
+    
+    startDateNumber = datenum(startYear, startMonth, startDate, startTimeHour, startTimeMinute, startTimeSecond);
+    endDateNumber = datenum(endYear, endMonth, endDate, endTimeHour, endTimeMinute, endTimeSecond);
+    
+    duration_in_fraction_day = endDateNumber - startDateNumber; % [fractional number of days]
+    dur_access(k) = duration_in_fraction_day * (24 * 60 * 60);
 end
-
 
 % Compute max, mean, min and total access duration for each satellite 
 %mean_comm_time     = mean(dur_access);

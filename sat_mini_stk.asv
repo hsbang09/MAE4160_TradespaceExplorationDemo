@@ -43,8 +43,8 @@ sat_info = {};
 sat_info.id = sat_name;
 sat_info.orbit = {};
 sat_info.orbit.ecc = 0;
-sat_info.orbit.sa = semimajorAxis;
-sat_info.orbit.inc = inc;
+sat_info.orbit.sa = semimajorAxis/1000; % [km]
+sat_info.orbit.inc = inc/pi*180; %[deg]
 sat_info.orbit.ap = 0;
 sat_info.orbit.raan = 0;
 sat_info.orbit.ma = 0;
@@ -62,22 +62,32 @@ sat_sensor = stkAddSensor( satellite, sensor_name, 'Rectangular', sensor_params)
 % IAgFacility facility: Facility object
 
 % Get access by STK Object
-access = satellite.GetAccessToObject(facility);
+access = sat_sensor.GetAccessToObject(ground_sensor);
 % Compute access
 access.ComputeAccess();
 
 
+intervalCollection = access.ComputedAccessIntervalTimes;
+Naccesses = intervalCollection.Count();
+intervalArrays = intervalCollection.ToArray(0,Naccesses);
 
-
-% Assign ground stations as asset for  satellite's antenna
-asset_id = sat_name;
-coverage = stkDefineCoverageAsset( scenario, asset_id );
-results = coverage.Compute;
-
-
-Naccesses = size(results,1)-2;
 dur_access = zeros(Naccesses,1);
 for k = 1:Naccesses
+    
+    startDateAndTime = intervalArrays(k, 1);
+    endDateAndTime = intervalArrays(k, 2);
+    
+    startDateAndTime = strsplit(startDateAndTime);
+    endDateAndTime = strsplit(endDateAndTime);
+    
+    startTime = strsplit(startDateAndTime{4}, ':');
+    endTime = strsplit(endDateAndTime{4}, ':');
+    
+    startDateNumber = datenum(startDateAndTime{3},convertMonthString2Number(startDateAndTime{2}),startDateAndTime{1},startTime{1},startTime{2},startTime{3});
+    endDateNumber = datenum(startDateAndTime{3},convertMonthString2Number(startDateAndTime{2}),startDateAndTime{1},startTime{1},startTime{2},startTime{3});
+    
+    
+    
     dur_access(k) = sscanf(results(k+1,:),'%*d,%*[^,],%*[^,],%f');
 end
 

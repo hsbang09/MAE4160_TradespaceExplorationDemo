@@ -12,7 +12,7 @@ function sensor = stkAddSensor( parentObj, sensorID, patternType, args)
         sensor.CommonTasks.SetPatternSimpleConic(40.0, 0.1); 
         
     elseif strcmp(patternType, 'Rectangular')
-        sensor.CommonTasks.SetPatternRectangular(20, 25) 
+        sensor.CommonTasks.SetPatternRectangular(40, 45) 
         
     else
         fprintf('Unrecognized sensor type used \n');
