@@ -17,10 +17,7 @@ function coverage = stkSetCoverage(scenario, coverage_name)
 	%Define the Grid Resolution 
 	Res = covGrid.Resolution; 
 	Res.LatLon = 6;   %deg 
-	
-	%Set the satellite as the Asset 
-	coverage.AssetList.Add('Satellite/Sat'); 
-	 
+    
 	% Turn off Show Grid Points 
 	coverage.Graphics.Static.IsPointsVisible = false; 
 end

@@ -116,29 +116,28 @@ for n=1:(nsats*nplanes)
     satellite = stkAddSatellite( scenario, sat_info );
 
     % Add a sensor (payload) to the satellite
-    s = 1;
+    s = n;
     sensor_name = ['Sensor' num2str(s)];
-    sensor_params = [eta, 90];
+    sensor_params = [angle_v, angle_h];
     sat_sensor = stkAddSensor( satellite, sensor_name, 'Rectangular', sensor_params);
-
-
-    
-    
-    
-    
-    % Set the satellite sensor using custom function (Rectangular)
-    stkSetSensor(conid,sensor_path,'Rectangular',angle_v,angle_h);
     
     % Add a sensor (communnications) to the satellite
-    antenna_name = ['Antenna' num2str(s)];
-    stkNewObj(['/Scenario/' scenario_name '/Satellite/' sat_name '/'], 'Sensor', antenna_name);
-    antenna_path = ['/Scenario/' scenario_name '/Satellite/' sat_name '/Sensor/' antenna_name];
+    sensor_name = ['Antenna' num2str(s)];
+    sensor_params = [45, 0.1];
+    sat_sensor = stkAddSensor( satellite, sensor_name, 'SimpleConic', sensor_params);
     
     % Set the communications sensor using custom function (Simple Cone)
-    stkSetSensor(conid,antenna_path,'HalfPower', f_GHz, D_SAT);
+    % stkSetSensor(conid,antenna_path,'HalfPower', f_GHz, D_SAT);
+    
     
     % Assign satellite's sensor as an asset to the coverage
-    stkSetCoverageAsset(conid, coverage_path, sensor_path);
+	coverage.AssetList.Add(strcat('Satellite/', sat_name)); 
+
+    
+    
+    
+    
+    
     
     % Assign both ground stations as assets for each satellite's antenna
     for m = 1:n_gs

@@ -5,14 +5,16 @@ function sensor = stkAddSensor( parentObj, sensorID, patternType, args)
     
     sensor = parentObj.Children.New('eSensor', sensorID);
 
+    args = mat2cell(args,1,ones(1,numel(args)));
+    
     % IAgSensor sensor: Sensor object
 	% Change pattern and set
     if strcmp(patternType, 'SimpleConic')
         % sensor.SetPatternType('eSnSimpleConic');
-        sensor.CommonTasks.SetPatternSimpleConic(40.0, 0.1); 
+        sensor.CommonTasks.SetPatternSimpleConic(args{:});
         
     elseif strcmp(patternType, 'Rectangular')
-        sensor.CommonTasks.SetPatternRectangular(40, 45) 
+        sensor.CommonTasks.SetPatternRectangular(args{:}); 
         
     else
         fprintf('Unrecognized sensor type used \n');
