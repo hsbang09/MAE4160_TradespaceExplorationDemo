@@ -21,14 +21,10 @@ function sat_out = sat_system(sat_in)
 %
 %   13 Oct 2008
 
+
 % Initialize the STK/MATLAB interface
-
-app = stkConnectToMatlab()
-
-
-
-
-
+agiInit;
+remMachine = stkDefaultHost;
 
 % open a socket to STK
 conid = stkOpen(remMachine);
@@ -41,6 +37,7 @@ stkSetAnimationTimeStep(conid,scenario_path,3);
 % for keeping track of the run
 total = numel(sat_in);
 counter = 1;
+
 
 for i = 1:size(sat_in,1)
     for j = 1:size(sat_in,2)
