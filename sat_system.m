@@ -34,9 +34,6 @@ try
     disp( 'Connecting Matlab to STK...' );
     [app, root] = stkConnectToMatlab();
 
-    % Create and configure the STK scenario
-    scenario = stkCreateAndConfigureScenario(root);
-
     % for keeping track of the run
     total = numel(sat_in);
     counter = 1;
@@ -56,7 +53,13 @@ try
                         temp = sat_optics(temp);
 
                         % First STK module
-                        temp = sat_mini_stk(temp,scenario);
+                        % Create and configure the STK scenario
+                        tStart = '27 Jul 2020 16:00:00.000';
+                        tStop = '27 Aug 2020 16:00:00.000';
+                        tStep = 3.0;
+                        scenario = stkCreateAndConfigureScenario(root, tStart, tStop, tStep);
+                        temp = sat_mini_stk(temp, scenario);
+                        root.CloseScenario;
 
                         % ADCS model
                         temp = sat_adcs(temp);
@@ -68,7 +71,12 @@ try
                         temp = sat_comm(temp);
 
                         % STK simulation
-    %                     temp = sat_stk(temp,scenario);
+                        % Create and configure the STK scenario
+                        tStart = '27 Jul 2020 16:00:00.000';
+                        tStop = '28 Jul 2020 16:00:00.000';
+                        tStep = 3.0;
+                        scenario = stkCreateAndConfigureScenario(root, tStart, tStop, tStep);
+                        temp = sat_stk(temp, scenario);
 
                         % thermal model
                         temp = sat_thermal(temp);

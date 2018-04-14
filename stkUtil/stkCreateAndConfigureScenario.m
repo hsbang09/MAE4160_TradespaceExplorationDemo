@@ -1,12 +1,12 @@
-function scenario = stkCreateAndConfigureScenario(root)
-    global params;
+function scenario = stkCreateAndConfigureScenario(root, tStart, tStop, tStep)
+
     fprintf('Creating a new scenario...');
     scenario = root.Children.New('eScenario','Scenario1');
     fprintf('DONE\n');
     
     fprintf('Configuring scenario...');
-    scenario.SetTimePeriod('27 Jul 2020 16:00:00.000','27 Aug 2020 16:00:00.000');
-    scenario.Animation.AnimStepValue = 3.0;
+    scenario.SetTimePeriod(tStart, tStop);
+    scenario.Animation.AnimStepValue = tStep;
     root.ExecuteCommand('Animate * Reset');
     fprintf('DONE\n');
 

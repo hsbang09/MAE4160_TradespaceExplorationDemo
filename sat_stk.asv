@@ -44,50 +44,24 @@ D_GS    = sat_in.ULTXAntennaDiameter; % Diameter of the ground station antenna
 % Create a ground station, set locations, add a sensor to each
 % -------------------------------------------------------------------------
 for i = 1:n_gs
-
-    % set sensor properties
-    stkSetSensor(conid, fac_sensor_path, 'HalfPower', f_GHz, D_GS);
-    
-    
-    
-    
-    
     facility_name = ['GS' num2str(i)];
     
-    % set location
-    lat_gs = lat_gs(i);
-    lon_gs = lon_gs(i);
-    LLApos = [dtr*lat_gs; dtr*lon_gs];
-
+    % set location 
     gs_info = {};
     gs_info.id = facility_name;
-    gs_info.lat = lat_gs;
-    gs_info.long = lon_gs;
+    gs_info.lat =  lat_gs(i);
+    gs_info.long = lon_gs(i);
+%     LLApos = [dtr*lat_gs; dtr*lon_gs];
 
     % Internal calculations
-
     % create a ground station
     facility = stkAddFacility(scenario, gs_info);
 
     % add a sensor to the ground station
     ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', []);
     
-    
-    
-    
-    
-    public IAgSnHalfPowerPattern setPatternHalfPower(
-   double Frequency, 
-   double AntennaDiameter, 
-   Variant AngularResolution
-);
-
-    
-    
-    
-    
-    
-    
+    % set sensor properties
+    % ground_sensor.CommonTasks.SetPatternHalfPower( f_GHz, D_GS  );
 end
 
 
@@ -95,38 +69,24 @@ end
 % Create a Coverage Grid
 % -------------------------------------------------------------------------
 coverage_name = 'Coverage1';
-stkNewObj(scenario_path, 'CoverageDefinition', coverage_name);
-coverage_path = ['/Scenario/' scenario_name '/' 'CoverageDefinition' '/' coverage_name '/'];
-%Set coverage properties (latitude bounds) using stkSetCoverageBounds
-lat_min = -70;
-lat_max = +70;
-stkSetCoverageBounds(conid,coverage_path, lat_min, lat_max);
-
+coverage = stkSetCoverage(scenario, coverage_name);
 
 % -------------------------------------------------------------------------
 % Create Figure of Merit: Revisit Time
 % -------------------------------------------------------------------------
 FOM_name1 = 'Revisit_Time';
-stkNewObj(coverage_path, 'FigureOfMerit', FOM_name1);
-FOM_path1 = [coverage_path 'FigureOfMerit/' FOM_name1 '/'];
-stkSetCoverageFOM(conid, FOM_path1, 'RevisitTime');
+FOM_revisit_time = stkSetFOM(coverage, FOM_name1, 'RevisitTime');
 
 % -------------------------------------------------------------------------
 % Create Figure of Merit: Response Time
 % -------------------------------------------------------------------------
 FOM_name2 = 'Response_Time';
-stkNewObj(coverage_path, 'FigureOfMerit', FOM_name2);
-FOM_path2 = [coverage_path 'FigureOfMerit/' FOM_name2 '/'];
-stkSetCoverageFOM(conid, FOM_path2, 'ResponseTime');
-
+FOM_response_time = stkSetFOM(coverage, FOM_name2, 'ResponseTime');
 
 % -------------------------------------------------------------------------
 % Create constellation with nplanes separated Delta_RAAN = 180/nplanes deg  
 % and nsats separated by Delta_Mean_Anom= 360/nsats deg
 % -------------------------------------------------------------------------
-tStart  = 0;
-tStop   = 86400.0;
-tStep   = 3.0;
 semimajorAxis = (Re + h)*1000;
 
 % Calculate the RAAN and mean anomaly of each satellite
@@ -141,10 +101,19 @@ for i=1:nplanes
     end
 end
 
-
 for n=1:(nsats*nplanes)
     sat_name = ['Sat' num2str(n)];
   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     % Create one satellite
     stkNewObj(scenario_path, 'Satellite', sat_name);
     satellite_path = ['/Scenario/' scenario_name '/Satellite/' sat_name '/'];
@@ -182,6 +151,11 @@ for n=1:(nsats*nplanes)
 
 
 end
+
+
+
+
+
 
 % -------------------------------------------------------------------------
 % Compute communications metrics

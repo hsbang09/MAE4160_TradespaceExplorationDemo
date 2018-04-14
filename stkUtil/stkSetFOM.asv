@@ -1,5 +1,7 @@
-function out = stkSetCoverageFOM(conid, path, type)
+function coverage = stkSetFOM(scenario, type)
 
+
+    
 % stkSetCoverageFOM(conid, path, type)
 %   Set Figure of Merit parameters of a given CoverageDefinition in STK.
 %
@@ -12,8 +14,6 @@ function out = stkSetCoverageFOM(conid, path, type)
 %
 %
 %   Daniel Selva <dselva> -- 11/6/08
-
-
 % -------------------------------------------------------------------------
 % Revisit Time
 % -------------------------------------------------------------------------
@@ -24,7 +24,7 @@ if strcmp(type, 'RevisitTime')
 % -------------------------------------------------------------------------
 % Response Time
 % -------------------------------------------------------------------------
-if strcmp(type, 'ResponseTime')
+elseif strcmp(type, 'ResponseTime')
    
     call = ['FOMDefine ' path ' ' 'Definition ' type];
 % -------------------------------------------------------------------------
@@ -38,4 +38,45 @@ end
 % call the 'Define' STK Connect command
 out = stkExec(conid, call);
 
-return;
+
+
+
+
+
+
+
+
+
+	% IAgScenario scenario: Scenario object 
+	%Create new Coverage Defintion and set the Bounds to an area target 
+	coverage = scenario.Children.New('eCoverageDefinition', coverage_name); 
+	coverage.Grid.BoundsType = 'eBoundsLat'; 
+	
+	covGrid = coverage.Grid; 
+	bounds = covGrid.Bounds; 
+    
+    lat_min = -70;
+    lat_max = +70;
+    
+    bounds.maxLatitude = lat_max;
+    bounds.minLatitude = lat_min;
+    
+	%Define the Grid Resolution 
+	Res = covGrid.Resolution; 
+	Res.LatLon = 6;   %deg 
+	
+	%Set the satellite as the Asset 
+	coverage.AssetList.Add('Satellite/Sat'); 
+	 
+	% Turn off Show Grid Points 
+	coverage.Graphics.Static.IsPointsVisible = false; 
+    
+    
+    
+    
+
+end
+
+
+
+

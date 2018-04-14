@@ -7,35 +7,22 @@ function coverage = stkSetCoverage(scenario, coverage_name)
 	
 	covGrid = coverage.Grid; 
 	bounds = covGrid.Bounds; 
-	bounds.AreaTargets.Add('AreaTarget/MyAreaTarget'); 
-	
-	
-	
-
-
-
-
-
-
-	
-	coverage.Grid.BoundsType = 'eBoundsCustomRegions'; 
-	covGrid = coverage.Grid; 
-	bounds = covGrid.Bounds; 
-	bounds.AreaTargets.Add('AreaTarget/MyAreaTarget'); 
-	
+    
+    lat_min = -70;
+    lat_max = +70;
+    
+    bounds.maxLatitude = lat_max;
+    bounds.minLatitude = lat_min;
+    
 	%Define the Grid Resolution 
 	Res = covGrid.Resolution; 
-	Res.LatLon = .5;   %deg 
+	Res.LatLon = 6;   %deg 
 	
 	%Set the satellite as the Asset 
-	coverage.AssetList.Add('Satellite/MySatellite'); 
+	coverage.AssetList.Add('Satellite/Sat'); 
 	 
 	% Turn off Show Grid Points 
 	coverage.Graphics.Static.IsPointsVisible = false; 
- 
- 
-
-
 end
 
 
