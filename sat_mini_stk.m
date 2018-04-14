@@ -26,7 +26,7 @@ gs_info.long = lon_gs;
 facility = stkAddFacility(scenario, gs_info);
 
 % add a sensor to the ground station
-ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', []);
+ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', [40,0.1]);
 
 % -------------------------------------------------------------------------
 % Create constellation with nplanes separated Delta_RAAN = 180/nplanes deg  

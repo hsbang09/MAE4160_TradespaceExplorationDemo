@@ -135,10 +135,10 @@ for n=1:(nsats*nplanes)
 	coverage.AssetList.Add(strcat('Satellite/', sat_name)); 
 
     % Assign both ground stations as assets for each satellite's antenna
-%     for m = 1:n_gs
-%         facility_name = ['GS' num2str(m)];
-%         sat_sensor.AssetList.Add(strcat('Facility/', facility_name, '/Sensor', '/Antenna')); 
-%     end
+    for m = 1:n_gs
+        facility_name = ['GS' num2str(m)];
+        sat_sensor.AssetList.Add(strcat('Facility/', facility_name, '/Sensor', '/Antenna')); 
+    end
 
 end
 
@@ -150,11 +150,18 @@ end
 % COMPUTE COMMUNICATION LINK DURATION (MAX, MEAN, MIN, TOTAL)
 
 % Create a file containing the paths of the antennas
+targetsfile = 'C:\Users\cit-labs\Downloads\analysis\targets.txt';
+fid = fopen(targetsfile,'w');
+
 for n=1:(nsats*nplanes)
     sat_name = ['Sat' num2str(n)];
     target_path = ['Satellite/' sat_name '/Sensor/Antenna/'];
+    fprintf(fid,'%s\n',target_path);
 end
 
+fclose(fid);
+
+targetsfile = ['"' targetsfile '"'];
 % Assign targets to ground station antennas using the file
 for i = 1:n_gs
     facility_name = ['GS' num2str(i)];
@@ -163,15 +170,6 @@ for i = 1:n_gs
     % Assign the targets in the file to the ground station
     AssignTargetToSensor(conid, fac_sensor_path, targetsfile);
 end
-
-
-
-
-
-
-
-
-
 
 
 % Initializations for computing performance
