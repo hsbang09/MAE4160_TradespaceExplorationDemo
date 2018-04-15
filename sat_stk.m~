@@ -159,6 +159,21 @@ end
 % -------------------------------------------------------------------------
 % COMPUTE COMMUNICATION LINK DURATION (MAX, MEAN, MIN, TOTAL)
 
+% Create a file containing the paths of the antennas
+for n=1:(nsats*nplanes)
+    sat_name = ['Sat' num2str(n)];
+    target_path = ['Satellite/' sat_name '/Sensor/Antenna/'];
+end
+
+% Assign targets to ground station antennas using the file
+for i = 1:n_gs
+    facility_name = ['GS' num2str(i)];
+    fac_sensor_path = ['/Scenario/' scenario_name '/Facility/' facility_name '/Sensor/Antenna'];
+
+    % Assign the targets in the file to the ground station
+    AssignTargetToSensor(conid, fac_sensor_path, targetsfile);
+end
+
 % Initializations for computing performance
 mean_comm_time = zeros(nsats*nplanes,1);
 max_comm_time = zeros(nsats*nplanes,1);
@@ -177,78 +192,6 @@ for i = 1:(nsats*nplanes)
     % ACCESS DURATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    
-    
-    
-    
-    
-    
-    
-    
-    % IAgSatellite satellite: Satellite object 
-    % IAgFacility facility: Facility object 
-    % Get access by STK Object 
-    access = satellite.GetAccessToObject(facility); 
-    % Compute access 
-    access.ComputeAccess(); 
- 
-    
-    
-    % Advanced settings
-    % IAgStkAccess access: Access object 
-%     access.Advanced.EnableLightTimeDelay = true; 
-%     access.Advanced.TimeLightDelayConvergence = .00005; 
-%     access.Advanced.AberrationType = 'eAberrationAnnual'; 
-%     access.Advanced.UseDefaultClockHostAndSignalSense = false; 
-%     access.Advanced.ClockHost = 'eIvBase'; 
-%     access.Advanced.SignalSenseOfClockHost = 'eIvTransmit'; 
-%     access.ComputeAccess; 
-
-
-    % Compute the interval
-    % IAgStkAccess access: Access calculation 
-    % Get and display the Computed Access Intervals 
-    intervalCollection = access.ComputedAccessIntervalTimes; 
-    % Set the intervals to use to the Computed Access Intervals 
-    computedIntervals = intervalCollection.ToArray(0, -1); 
-    access.SpecifyAccessIntervals(computedIntervals); 
- 
-    
-    % Configure the access analysis time period to specified time instants.
-    % IAgStkObjectRoot root: STK Object Model root 
-    satellite = root.GetObjectFromPath('/Satellite/MySatellite'); 
-    facility = root.GetObjectFromPath('/Facility/MyFacility'); 
-
-    % For this code snippet, let's use the time interval when the satellite reached min and max altitude values. 
-    % Note, this assumes time at min happens before time at max. 
-    timeOfAltMin = satellite.Vgt.Events.Item('GroundTrajectory.Detic.LLA.Altitude.TimeOfMin'); 
-    timeOfAltMax = satellite.Vgt.Events.Item('GroundTrajectory.Detic.LLA.Altitude.TimeOfMax'); 
-
-    % Set the access time period with the times we figured out above. 
-    access = satellite.GetAccessToObject(facility); 
-    access.AccessTimePeriod = 'eUserSpecAccessTime'; 
-    accessTimePeriod = access.AccessTimePeriodData; 
-
-    accessTimePeriod.AccessInterval.State = 'eCrdnSmartIntervalStateStartStop'; 
-
-    accessStartEpoch = accessTimePeriod.AccessInterval.GetStartEpoch(); 
-    accessStartEpoch.SetImplicitTime(timeOfAltMin); 
-    accessTimePeriod.AccessInterval.SetStartEpoch(accessStartEpoch); 
-    accessStopEpoch = accessTimePeriod.AccessInterval.GetStopEpoch(); 
-    accessStopEpoch.SetImplicitTime(timeOfAltMax); 
-    accessTimePeriod.AccessInterval.SetStopEpoch(accessStopEpoch); 
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     % Compute Access of each sat to both GS
     call = ['Cov_RM ' sat_antenna_path ' Access Compute "Coverage"'];
     results = stkExec(conid,call);
@@ -264,24 +207,11 @@ for i = 1:(nsats*nplanes)
     min_comm_time(i)      = min(dur_access);
     total_comm_time(i)    = sum(dur_access);
 
-    
-    
-    
-    
-    
-    
-    
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % RESPONSE TIME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % Define FOM Response Time for each satellite
-    
-    
-    
-    
-    
-    
     call = ['Cov ' sat_antenna_path ' FOMDefine Definition ResponseTime Compute Average'];
     stkExec(conid,call);
     
