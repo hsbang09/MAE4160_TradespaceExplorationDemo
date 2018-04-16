@@ -29,6 +29,8 @@ function sat_out = sat_system(sat_in)
 
 try
     
+    f = waitbar(0,'Starting simulation...');
+    
     % Initialize the STK/MATLAB interface
     % Connect to STK
     disp( 'Connecting Matlab to STK...' );
@@ -44,6 +46,9 @@ try
             for k = 1:size(sat_in,3)
                 for l = 1:size(sat_in,4)
                     for m = 1:size(sat_in,5)
+                        
+                        waitbar((counter-1)/total,f,'Processing...');
+                        pause(1)
 
                         temp = sat_in(i,j,k,l,m);
 
@@ -110,11 +115,13 @@ try
         end
     end
 
+    close(f);
     disp( 'Closing the STK scenario...' );
     root.CloseScenario;
 
 catch exception
-        
+    
+    close(f);
 %     clear params;
 %     clear r;
 % 
