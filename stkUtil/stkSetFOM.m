@@ -1,4 +1,4 @@
-function coverage = stkSetFOM( coverage, FOM_name, type)
+function fom = stkSetFOM( coverage, FOM_name, type)
 
     % IAgCoverageDefinition coverage: Coverage object 
     fom = coverage.Children.New('eFigureOfMerit', FOM_name); 

@@ -39,7 +39,7 @@ D_GS    = sat_in.ULTXAntennaDiameter; % Diameter of the ground station antenna
 
 % Internal calculations
 
-
+ground_stations = [];
 % -------------------------------------------------------------------------
 % Create a ground station, set locations, add a sensor to each
 % -------------------------------------------------------------------------
@@ -56,9 +56,10 @@ for i = 1:n_gs
     % Internal calculations
     % create a ground station
     facility = stkAddFacility(scenario, gs_info);
+    ground_stations = [ground_stations facility];
 
     % add a sensor to the ground station
-    ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', [40, 0.1]);
+    % ground_sensor = stkAddSensor(facility, 'Antenna', 'SimpleConic', [40, 0.1]);
     
     % set sensor properties
     % ground_sensor.CommonTasks.SetPatternHalfPower( f_GHz, D_GS  );
@@ -101,6 +102,8 @@ for i=1:nplanes
     end
 end
 
+satellites = [];
+
 for n=1:(nsats*nplanes)
     sat_name = ['Sat' num2str(n)];
 
@@ -114,6 +117,7 @@ for n=1:(nsats*nplanes)
     sat_info.orbit.raan = raan(n);
     sat_info.orbit.ma = MeanAnomaly(n);
     satellite = stkAddSatellite( scenario, sat_info );
+    satellites = [satellites satellite];
 
     % Add a sensor (payload) to the satellite
     s = n;
@@ -123,24 +127,35 @@ for n=1:(nsats*nplanes)
     sat_sensor = stkAddSensor( satellite, sensor_name, 'Rectangular', sensor_params);
     
     % Add a sensor (communnications) to the satellite
-    sensor_name = 'Antenna';
-    %sensor_name = ['Antenna' num2str(s)];
-    sensor_params = [40, 0.1];
-    sat_sensor = stkAddSensor( satellite, sensor_name, 'SimpleConic', sensor_params);
+    % sensor_name = 'Antenna';
+    % sensor_name = ['Antenna' num2str(s)];
+    % sensor_params = [40, 0.1];
+    % sat_sensor = stkAddSensor( satellite, sensor_name, 'SimpleConic', sensor_params);
     
     % Set the communications sensor using custom function (Simple Cone)
     % stkSetSensor(conid,antenna_path,'HalfPower', f_GHz, D_SAT);
     
     % Assign satellite's sensor as an asset to the coverage
-	coverage.AssetList.Add(strcat('Satellite/', sat_name)); 
+	coverage.AssetList.Add(strcat('Satellite/', sat_name, '/Sensor/Sensor')); 
+    %'/Application/STK/Scenario/Scenario1/Satellite/Sat1/Sensor/Sensor'
 
     % Assign both ground stations as assets for each satellite's antenna
-    for m = 1:n_gs
-        facility_name = ['GS' num2str(m)];
-        sat_sensor.AssetList.Add(strcat('Facility/', facility_name, '/Sensor', '/Antenna')); 
-    end
+%     for m = 1:n_gs
+%         facility_name = ['GS' num2str(m)];
+%         sat_sensor.AssetList.Add(strcat('Facility/', facility_name, '/Sensor', '/Antenna')); 
+%     end
 
 end
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -148,29 +163,6 @@ end
 % Compute communications metrics
 % -------------------------------------------------------------------------
 % COMPUTE COMMUNICATION LINK DURATION (MAX, MEAN, MIN, TOTAL)
-
-% Create a file containing the paths of the antennas
-targetsfile = 'C:\Users\cit-labs\Downloads\analysis\targets.txt';
-fid = fopen(targetsfile,'w');
-
-for n=1:(nsats*nplanes)
-    sat_name = ['Sat' num2str(n)];
-    target_path = ['Satellite/' sat_name '/Sensor/Antenna/'];
-    fprintf(fid,'%s\n',target_path);
-end
-
-fclose(fid);
-
-targetsfile = ['"' targetsfile '"'];
-% Assign targets to ground station antennas using the file
-for i = 1:n_gs
-    facility_name = ['GS' num2str(i)];
-    fac_sensor_path = ['/Scenario/' scenario_name '/Facility/' facility_name '/Sensor/Antenna'];
-
-    % Assign the targets in the file to the ground station
-    AssignTargetToSensor(conid, fac_sensor_path, targetsfile);
-end
-
 
 % Initializations for computing performance
 mean_comm_time = zeros(nsats*nplanes,1);
@@ -183,86 +175,123 @@ max_resp_time = zeros(nsats*nplanes,1);
 mean_resp_time = zeros(nsats*nplanes,1);
 
 for i = 1:(nsats*nplanes)
-    sat_name = ['Sat' num2str(i)];
-    sat_antenna_path = ['/Scenario/' scenario_name '/Satellite/' sat_name '/Sensor/Antenna1/'];
     
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % ACCESS DURATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   
+    satellite = satellites(i);
+    durationsCombined = [];
     
-    % Compute Access of each sat to both GS
-    call = ['Cov_RM ' sat_antenna_path ' Access Compute "Coverage"'];
-    results = stkExec(conid,call);
-    Naccesses = size(results,1)-2;
-    dur_access = zeros(Naccesses,1);
-    for k = 1:Naccesses
-        dur_access(k) = sscanf(results(k+1,:),'%*d,%*[^,],%*[^,],%f');
+    for j = 1:length(ground_stations)
+        
+        facility = ground_stations(1);
+       
+        % IAgSatellite satellite: Satellite object 
+        % IAgFacility facility: Facility object 
+        % Get access by STK Object 
+        access = satellite.GetAccessToObject(facility); 
+        % Compute access 
+        access.ComputeAccess(); 
+
+        res =  access.DataProviders.Item('Access Data').Exec(scenario.StartTime,scenario.StopTime);
+        durations = cell2mat(res.DataSets.GetDataSetByName('Duration').GetValues);
+    
+        durationsCombined = [durationsCombined durations];
+        
     end
-
+        
+    NaccessesDay(i)=length(durations)/31; %simulation is carried on a defined scenario of 31 days defined in stkCreateAndConfigureScenario(root)
+    
     % Compute max, mean, min and total access duration for each satellite 
-    mean_comm_time(i)     = mean(dur_access);
-    max_comm_time(i)      = max(dur_access);
-    min_comm_time(i)      = min(dur_access);
-    total_comm_time(i)    = sum(dur_access);
+    mean_comm_time(i)     = mean(durations);
+    max_comm_time(i)      = max(durations);
+    min_comm_time(i)      = min(durations);
+    total_comm_time(i)    = sum(durations);
 
+    
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % RESPONSE TIME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    % Define FOM Response Time for each satellite
-    call = ['Cov ' sat_antenna_path ' FOMDefine Definition ResponseTime Compute Average'];
-    stkExec(conid,call);
-    
-    % Compute RT
-    call = ['Cov ' sat_antenna_path ' Access Compute Export "FOM Value" "C:\Users\Dani\Documents\PhD\coursework\16.851 Satellite engineering\project\models\matlab\results.csv"'];
-    stkExec(conid,call);
-    
-    % Read the file
-    fid = fopen('C:\Users\Dani\Documents\PhD\coursework\16.851 Satellite engineering\project\models\matlab\results.csv','r');
-    C = textscan(fid,'%*[^,],%f\n','Headerlines',7,'BufSize',25000);
-    resp_time = C{1};
-    fclose(fid);
-    
-    % Suppress the 1e6 from the results (points after the last access are
-    % fixed to 1e6 response time by STK)
-    l = 1;
-    for k = 1:length(resp_time)
-        if resp_time(k) ~= 1000000
-            resp_time2(l,1) = resp_time(k);
-            l = l+1;
-        else
-            break;
-        end
-    end
-
-    % Compute min, mean, max response time
-    min_resp_time(i) = min(resp_time2);
-    max_resp_time(i) = max(resp_time2);
-    mean_resp_time(i) = mean(resp_time2);
+%     
+%     % Define FOM Response Time for each satellite
+%     call = ['Cov ' sat_antenna_path ' FOMDefine Definition ResponseTime Compute Average'];
+%     stkExec(conid,call);
+%     
+%     % Compute RT
+%     call = ['Cov ' sat_antenna_path ' Access Compute Export "FOM Value" "C:\Users\Dani\Documents\PhD\coursework\16.851 Satellite engineering\project\models\matlab\results.csv"'];
+%     stkExec(conid,call);
+%     
+%     % Read the file
+%     fid = fopen('C:\Users\Dani\Documents\PhD\coursework\16.851 Satellite engineering\project\models\matlab\results.csv','r');
+%     C = textscan(fid,'%*[^,],%f\n','Headerlines',7,'BufSize',25000);
+%     resp_time = C{1};
+%     fclose(fid);
+%     
+%     % Suppress the 1e6 from the results (points after the last access are
+%     % fixed to 1e6 response time by STK)
+%     l = 1;
+%     for k = 1:length(resp_time)
+%         if resp_time(k) ~= 1000000
+%             resp_time2(l,1) = resp_time(k);
+%             l = l+1;
+%         else
+%             break;
+%         end
+%     end
+% 
+%     % Compute min, mean, max response time
+%     min_resp_time(i) = min(resp_time2);
+%     max_resp_time(i) = max(resp_time2);
+%     mean_resp_time(i) = mean(resp_time2);
 end
+
+
+
+
+
 % -------------------------------------------------------------------------
 % Compute Optics metrics
 % -------------------------------------------------------------------------
 
 % Access calculation
-stkComputeAccess(conid,coverage_path);
+coverage.ComputeAccesses;
 
-% Time to 100% coverage
-[cov_data, cov_names] = stkReport(coverage_path, 'Percent Coverage');
-time = stkFindData(cov_data{2}, 'Time');             % # of seconds past start time
-cov  = stkFindData(cov_data{2}, '% Accum Coverage'); % accumlated coverage
-coverage_time = NaN;
-for i = 1:length(cov)
-    if cov(i) >= 80
-        coverage_time = time(i);
-    break;
-    end
-end
+
+
+
+
+
+
+
+
+
+% % Time to 100% coverage
+% [cov_data, cov_names] = stkReport(coverage_path, 'Percent Coverage');
+% time = stkFindData(cov_data{2}, 'Time');             % # of seconds past start time
+% cov  = stkFindData(cov_data{2}, '% Accum Coverage'); % accumlated coverage
+% coverage_time = NaN;
+% for i = 1:length(cov)
+%     if cov(i) >= 80
+%         coverage_time = time(i);
+%     break;
+%     end
+% end
 
 % Percent coverage at the end of simulation period
-final_cov = cov(end);
+% final_cov = cov(end);
+
+
+
+
+
+
+res =  FOM_revisit_time.DataProviders.Item('Access Data').Exec(scenario.StartTime,scenario.StopTime);
+durations = cell2mat(res.DataSets.GetDataSetByName('Duration').GetValues);
 
 % Revisit time for targets
+res =  FOM_revisit_time.DataProviders.Item('Access Data');
+
 [rt_data, rt_names] = stkReport(FOM_path1, 'Value By Grid Point');
 rt_value = stkFindData(rt_data{3}, 'FOM Value');    % revisit time by grid point
 max_revisit_time = max(rt_value);
@@ -278,6 +307,14 @@ mean_response_time = mean(rt_value);
 NImagesPerDay = 86400/mean_revisit_time;
 
 
+
+
+
+
+
+
+
+
 % -------------------------------------------------------------------------
 % Assign outputs
 % -------------------------------------------------------------------------
@@ -286,27 +323,20 @@ sat_out.RevisitTimeMax  = max_revisit_time;
 sat_out.RevisitTimeMean = mean_revisit_time;
 sat_out.ResponseTimeMax  = max_response_time;
 sat_out.ResponseTimeMean = mean_response_time;
-sat_out.CoverageTime    = coverage_time;
-sat_out.FinalCoverage   = final_cov;
+% sat_out.CoverageTime    = coverage_time;
+% sat_out.FinalCoverage   = final_cov;
 
 sat_out.CommDurationMax = max(max_comm_time);
 sat_out.CommDurationMean = mean(mean_comm_time);
 sat_out.CommDurationMin = min(min_comm_time);
 sat_out.CommDurationTotal = sum(total_comm_time);
 
-sat_out.CommRespTimeMax  = max(max_resp_time);
-sat_out.CommRespTimeMean = mean(mean_resp_time);
+% sat_out.CommRespTimeMax  = [];
+% sat_out.CommRespTimeMean = [];
+% sat_out.CommRespTimeMax  = max(max_resp_time);
+% sat_out.CommRespTimeMean = mean(mean_resp_time);
 
 sat_out.NImagesPerDay = NImagesPerDay;
-
-% -------------------------------------------------------------------------
-% Close all objects except the scenario
-% -------------------------------------------------------------------------
-objects = stkObjNames;
-for i = length(objects):-1:2
-    stkUnload(objects{i});
-end
-
 
 return;
 
