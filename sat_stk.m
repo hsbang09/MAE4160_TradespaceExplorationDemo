@@ -186,7 +186,7 @@ for i = 1:(nsats*nplanes)
         res =  access.DataProviders.Item('Access Data').Exec(scenario.StartTime,scenario.StopTime);
         durations = cell2mat(res.DataSets.GetDataSetByName('Duration').GetValues);
     
-        durationsCombined = [durationsCombined durations];
+        durationsCombined = cat(1, durationsCombined, durations)
         
     end
         
