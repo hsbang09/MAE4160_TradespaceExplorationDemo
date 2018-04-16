@@ -33,6 +33,7 @@ try
     % Connect to STK
     disp( 'Connecting Matlab to STK...' );
     [app, root] = stkConnectToMatlab();
+    root.CloseScenario;
 
     % for keeping track of the run
     total = numel(sat_in);
@@ -77,6 +78,7 @@ try
                         tStep = 3.0;
                         scenario = stkCreateAndConfigureScenario(root, tStart, tStop, tStep);
                         temp = sat_stk(temp, scenario);
+                        root.CloseScenario;
 
                         % thermal model
                         temp = sat_thermal(temp);

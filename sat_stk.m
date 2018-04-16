@@ -148,17 +148,6 @@ for n=1:(nsats*nplanes)
 end
 
 
-
-
-
-
-
-
-
-
-
-
-
 % -------------------------------------------------------------------------
 % Compute communications metrics
 % -------------------------------------------------------------------------
@@ -185,7 +174,7 @@ for i = 1:(nsats*nplanes)
     
     for j = 1:length(ground_stations)
         
-        facility = ground_stations(1);
+        facility = ground_stations(j);
        
         % IAgSatellite satellite: Satellite object 
         % IAgFacility facility: Facility object 
@@ -258,14 +247,6 @@ end
 coverage.ComputeAccesses;
 
 
-
-
-
-
-
-
-
-
 % % Time to 100% coverage
 % [cov_data, cov_names] = stkReport(coverage_path, 'Percent Coverage');
 % time = stkFindData(cov_data{2}, 'Time');             % # of seconds past start time
@@ -282,37 +263,19 @@ coverage.ComputeAccesses;
 % final_cov = cov(end);
 
 
-
-
-
-
-res =  FOM_revisit_time.DataProviders.Item('Access Data').Exec(scenario.StartTime,scenario.StopTime);
-durations = cell2mat(res.DataSets.GetDataSetByName('Duration').GetValues);
-
 % Revisit time for targets
-res =  FOM_revisit_time.DataProviders.Item('Access Data');
-
-[rt_data, rt_names] = stkReport(FOM_path1, 'Value By Grid Point');
-rt_value = stkFindData(rt_data{3}, 'FOM Value');    % revisit time by grid point
-max_revisit_time = max(rt_value);
-mean_revisit_time = mean(rt_value);
+% http://help.agi.com/stk/Subsystems/dataProviders/dataProviders.htm#dpIntro.htm%3FTocPath%3DData%2520Providers%2520Reference%7C_____0
+res = FOM_revisit_time.DataProviders.Item('Overall Value').Exec();
+max_revisit_time = cell2mat(res.DataSets.GetDataSetByName('Maximum').GetValues);
+mean_revisit_time = cell2mat(res.DataSets.GetDataSetByName('Average').GetValues);
 
 % Response time for targets
-[rt_data, rt_names] = stkReport(FOM_path2, 'Value By Grid Point');
-rt_value = stkFindData(rt_data{3}, 'FOM Value');    % revisit time by grid point
-max_response_time = max(rt_value);
-mean_response_time = mean(rt_value);
+res = FOM_response_time.DataProviders.Item('Overall Value').Exec();
+max_response_time = cell2mat(res.DataSets.GetDataSetByName('Maximum').GetValues);
+mean_response_time = cell2mat(res.DataSets.GetDataSetByName('Average').GetValues);
 
 % Calculate number of images per day
 NImagesPerDay = 86400/mean_revisit_time;
-
-
-
-
-
-
-
-
 
 
 % -------------------------------------------------------------------------

@@ -283,15 +283,14 @@ coverage.ComputeAccesses;
 
 
 
-
-
-
-res =  FOM_revisit_time.DataProviders.Item('Access Data').Exec(scenario.StartTime,scenario.StopTime);
-durations = cell2mat(res.DataSets.GetDataSetByName('Duration').GetValues);
-
 % Revisit time for targets
-res =  FOM_revisit_time.DataProviders.Item('Access Data');
+% http://help.agi.com/stk/Subsystems/dataProviders/dataProviders.htm#dpIntro.htm%3FTocPath%3DData%2520Providers%2520Reference%7C_____0
+res = FOM_revisit_time.DataProviders.Item('Overall Value').Exec();
+maxRevisitTime = cell2mat(res.DataSets.GetDataSetByName('Maximum').GetValues);
 
+
+
+res =  FOM_revisit_time.DataProviders.Item('Access Data');
 [rt_data, rt_names] = stkReport(FOM_path1, 'Value By Grid Point');
 rt_value = stkFindData(rt_data{3}, 'FOM Value');    % revisit time by grid point
 max_revisit_time = max(rt_value);
