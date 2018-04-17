@@ -107,7 +107,7 @@ try
                         else
                             writeHeader = false;
                         end
-                        writeToFile('C:\Users\cit-labs\Downloads\MAE4160_TradespaceExplorationDemo\data\data3.csv', temp, writeHeader);
+                        writeToFile('C:\Users\cit-labs\Downloads\MAE4160_TradespaceExplorationDemo\data\reforumatedData2.csv', temp, writeHeader);
                         
                         % display message
                         fprintf('%3.0f of %3.0f\n', counter, total);
