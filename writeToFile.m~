@@ -1,0 +1,41 @@
+function writeToFile(filePath, sat, writeHeader)
+
+    colnames = [];
+
+    if writeHeader
+        colnames = fieldnames(sat);
+        fid = fopen(filePath, 'w') ;
+        fprintf(fid, '%s,', colnames{1,1:end-1}) ;
+        fprintf(fid, '%s\n', colnames{1,end}) ;
+        fclose(fid) ;
+        
+        colnames_temp = strings(1, length(colnames));
+        for i = 1:length(colnames)
+            colnames_temp(i) = colnames{i};
+        end
+        colnames = colnames_temp;
+    
+    else % Assume there is already a header
+        text = fileread(filePath);
+        header = splitlines(text);
+        header = header{1};
+        header = strsplit(header, ',');
+        
+        colnames = strings(1, length(header));
+        for i = 1:length(header)
+            colnames(i) = header{i};
+        end
+    end
+
+    content = strings(1, length(colnames));
+    
+    for i = 1:length(colnames)
+%         content(i) = getfield(sat, colnames(i));
+        content(i) = 
+    end
+    
+    dlmwrite(filePath, content, '-append');
+    
+    
+    
+end

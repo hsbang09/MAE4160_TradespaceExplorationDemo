@@ -99,7 +99,7 @@ try
 
                         % cost model
                         temp = sat_cost(temp);
-
+                      
                         sat_out(i,j,k,l,m) = temp;
 
                         % display message
