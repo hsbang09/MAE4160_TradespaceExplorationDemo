@@ -31,7 +31,11 @@ function writeToFile(filePath, sat, writeHeader)
     
     for i = 1:length(colnames)
         % Get value of a struct
-        value = sat.(colnames(i));
+        % fprintf(strcat(colnames(i),"\n"));
+        
+        name = char(colnames(i));
+        value = sat.(name);
+        % value = getfield(sat, name);
         
         if length(value) == 1 % struct is a single input (either numeric or string)
             if isnumeric(value)
