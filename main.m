@@ -7,7 +7,7 @@ clc;
 % % out = sat_plot(sat,'TotalNImagesDay','RevisitTimeMean');
 
 %script_multiaxis.m
-sat = sat_compare('Altitude',[467,567,667,767],'Nsats',[4,8,12],'Nplanes',[1,2,4]);
+sat = sat_compare('Altitude',[467,567,667,767],'Nsats',[2,4,6],'Nplanes',[1,2,4]);
 sat = sat_system(sat);
 % out = sat_plot(sat,'TotalNImagesDay','RevisitTimeMean');
 

@@ -44,7 +44,7 @@ sat.Nplanes         = 2;            % number of planes
 sat.MaxPointing     = 20;           % maximum pointing angle from nadir [deg]
 
 % optical
-sat.GResOff         = 1;            % ground resolution at max off-nadir angle  [m]
+sat.GResOff         = 10;            % ground resolution at max off-nadir angle  [m]
 sat.GSD             = 0.5;          % Ground Sampling Distance = half of resolution [m] 
 sat.Wavelength      = 500e-9;       % observation wavelength [m]
 sat.NPixCrosstrack  = 6000;         % number of CCD pixels along the crosstrack direction [#]
